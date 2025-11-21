@@ -31,4 +31,12 @@ public class Product {
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
+
 }

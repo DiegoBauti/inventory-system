@@ -26,4 +26,8 @@ public class User {
     private LocalDateTime createdAt;
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }

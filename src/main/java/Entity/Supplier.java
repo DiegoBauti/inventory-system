@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "suppliers")
@@ -26,4 +27,7 @@ public class Supplier {
     private LocalDateTime createdAt;
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "supplier")
+    private List<Product> products;
 }
