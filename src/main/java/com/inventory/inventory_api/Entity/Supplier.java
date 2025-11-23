@@ -21,7 +21,6 @@ public class Supplier {
     private String name;
     private String email;
     private String phone;
-    private boolean status=true;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
