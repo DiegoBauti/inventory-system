@@ -1,7 +1,7 @@
 package com.inventory.inventory_api.Mapper;
 
 import com.inventory.inventory_api.Entity.Supplier;
-import com.inventory.inventory_api.dto.SupplierRequestDTO;
+import com.inventory.inventory_api.dto.SupplierCreateDTO;
 import com.inventory.inventory_api.dto.SupplierResponseDTO;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class SupplierMapper {
         return dtos;
     }
 
-    public static Supplier toEntity(SupplierRequestDTO dto) {
+    public static Supplier toEntity(SupplierCreateDTO dto) {
         Supplier supplier = new Supplier();
         supplier.setName(dto.getName());
         supplier.setPhone(dto.getPhone());

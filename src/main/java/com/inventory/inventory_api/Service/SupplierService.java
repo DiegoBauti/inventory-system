@@ -6,8 +6,9 @@ import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.SupplierMapper;
 import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.Repository.SupplierRepository;
-import com.inventory.inventory_api.dto.SupplierRequestDTO;
+import com.inventory.inventory_api.dto.SupplierCreateDTO;
 import com.inventory.inventory_api.dto.SupplierResponseDTO;
+import com.inventory.inventory_api.dto.SupplierUpdateDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,7 +44,10 @@ public class SupplierService {
     }
 
     @Transactional
-    public SupplierResponseDTO save(SupplierRequestDTO supplierDto){
+    public SupplierResponseDTO save(SupplierCreateDTO supplierDto){
+        if (supplierRepository.existsByName(supplierDto.getName())) {
+            throw new BusinessException("There is already a supplier with that name");
+        }
         Supplier supplier=SupplierMapper.toEntity(supplierDto);
         Supplier saved = supplierRepository.save(supplier);
         return SupplierMapper.toDTO(saved);
@@ -53,32 +57,35 @@ public class SupplierService {
     public void delete(int id) {
 
         if (!supplierRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Proveedor no encontrado con ID: " + id);
+            throw new ResourceNotFoundException("Supplier not found with ID: " + id);
         }
 
         long productCount = productRepository.countBySupplierId(id);
 
         if (productCount > 0) {
             throw new BusinessException(
-                    "No se puede eliminar el proveedor porque tiene " + productCount +
-                            " producto(s) asociado(s). Elimine o reasigne los productos primero."
+                    "The provider cannot be removed because it has " + productCount +
+                    " associated product(s). Remove or reassign the products first"
             );
         }
 
-        // 3. Si no tiene productos, eliminar
         supplierRepository.deleteById(id);
     }
 
 
     @Transactional
-    public Optional<SupplierResponseDTO> update(int id,SupplierRequestDTO supplierDto){
+    public Optional<SupplierResponseDTO> update(int id, SupplierUpdateDTO supplierDto){
         Optional<Supplier> SupplierOpt = supplierRepository.findById(id);
         if (SupplierOpt.isPresent()){
             Supplier supplier=SupplierOpt.get();
 
-            if (supplierDto.getName() != null) {
+            if (supplierDto.getName() != null && !supplier.getName().equalsIgnoreCase(supplierDto.getName())) {
+                if (supplierRepository.existsByName(supplierDto.getName())) {
+                    throw new BusinessException("There is already a supplier with that name");
+                }
                 supplier.setName(supplierDto.getName());
             }
+
             if (supplierDto.getEmail() != null) {
                 supplier.setEmail(supplierDto.getEmail());
             }
