@@ -1,5 +1,6 @@
-package Entity;
+package com.inventory.inventory_api.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,25 +10,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "suppliers")
+@Table(name = "categories")
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Supplier {
+@AllArgsConstructor
+public class Category {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
-    private String email;
-    private String phone;
-    private boolean status=true;
+    private String description;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", insertable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "supplier")
+    @OneToMany(mappedBy = "category")
     private List<Product> products;
 }

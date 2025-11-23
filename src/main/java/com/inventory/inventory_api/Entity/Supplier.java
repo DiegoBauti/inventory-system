@@ -1,29 +1,26 @@
-package Entity;
+package com.inventory.inventory_api.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "suppliers")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Product {
+public class Supplier {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String name;
-
-    @Column(precision = 10,scale = 2)
-    private BigDecimal price;
-    private int stock;
-    private String description;
+    private String email;
+    private String phone;
     private boolean status=true;
 
     @Column(name = "created_at")
@@ -31,12 +28,6 @@ public class Product {
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-
-    @ManyToOne
-    @JoinColumn(name = "supplier_id")
-    private Supplier supplier;
-
+    @OneToMany(mappedBy = "supplier")
+    private List<Product> products;
 }

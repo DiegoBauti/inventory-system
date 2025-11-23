@@ -1,4 +1,4 @@
-package Entity;
+package com.inventory.inventory_api.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,28 +6,28 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "users")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category {
-
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-
     private String name;
-    private String description;
+    private String email;
+    private String username;
+    private String password;
     private boolean status=true;
 
-    @Column(name = "created_at", insertable = false)
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 }

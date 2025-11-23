@@ -1,6 +1,6 @@
-package Repository;
+package com.inventory.inventory_api.Repository;
 
-import Entity.Supplier;
+import com.inventory.inventory_api.Entity.Supplier;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

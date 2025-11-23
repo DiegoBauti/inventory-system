@@ -1,4 +1,4 @@
-package Entity;
+package com.inventory.inventory_api.Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
