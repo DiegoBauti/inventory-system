@@ -1,8 +1,11 @@
 package com.inventory.inventory_api.Service;
 
 import com.inventory.inventory_api.Entity.Category;
+import com.inventory.inventory_api.Exception.BusinessException;
+import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.CategoryMapper;
 import com.inventory.inventory_api.Repository.CategoryRepository;
+import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.dto.CategoryRequestDTO;
 import com.inventory.inventory_api.dto.CategoryResponseDTO;
 import org.springframework.stereotype.Service;
@@ -14,10 +17,12 @@ import java.util.Optional;
 @Service
 public class CategoryService {
 
+    private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
 
-    public CategoryService(CategoryRepository categoryRepository){
+    public CategoryService(CategoryRepository categoryRepository,ProductRepository productRepository){
         this.categoryRepository=categoryRepository;
+        this.productRepository=productRepository;
     }
 
     @Transactional(readOnly = true)
@@ -46,15 +51,20 @@ public class CategoryService {
     }
 
     @Transactional
-    public Optional<CategoryResponseDTO> delete(int id){
-        Optional<Category> categoryOptional=categoryRepository.findById(id);
-        if (categoryOptional.isPresent()){
-            Category category=categoryOptional.get();
-            CategoryResponseDTO dto=CategoryMapper.toDTO(category);
-            categoryRepository.delete(category);
-            return Optional.of(dto);
+    public void delete(int id){
+        if (!categoryRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Categoría no encontrada con ID: " + id);
         }
-        return Optional.empty();
+
+        long productsCount = productRepository.countByCategoryId(id);
+
+        if (productsCount > 0) {
+            throw new BusinessException(
+                    "No se puede eliminar la categoría porque tiene " + productsCount +
+                            " producto(s) asociado(s). Elimine o reasigne los productos primero."
+            );
+        }
+        categoryRepository.deleteById(id);
     }
 
     @Transactional

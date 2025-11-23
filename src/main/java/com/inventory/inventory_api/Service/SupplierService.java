@@ -1,7 +1,10 @@
 package com.inventory.inventory_api.Service;
 
 import com.inventory.inventory_api.Entity.Supplier;
+import com.inventory.inventory_api.Exception.BusinessException;
+import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.SupplierMapper;
+import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.Repository.SupplierRepository;
 import com.inventory.inventory_api.dto.SupplierRequestDTO;
 import com.inventory.inventory_api.dto.SupplierResponseDTO;
@@ -14,9 +17,11 @@ import java.util.Optional;
 @Service
 public class SupplierService {
     private final SupplierRepository supplierRepository;
+    private final ProductRepository productRepository;
 
-    public SupplierService(SupplierRepository supplierRepository){
+    public SupplierService(SupplierRepository supplierRepository,ProductRepository productRepository){
         this.supplierRepository=supplierRepository;
+        this.productRepository=productRepository;
     }
 
     @Transactional(readOnly = true)
@@ -45,16 +50,25 @@ public class SupplierService {
     }
 
     @Transactional
-    public Optional<SupplierResponseDTO> delete(int id){
-        Optional<Supplier> supplierOptional=supplierRepository.findById(id);
-        if (supplierOptional.isPresent()){
-            Supplier supplier=supplierOptional.get();
-            SupplierResponseDTO dto=SupplierMapper.toDTO(supplier);
-            supplierRepository.delete(supplier);
-            return Optional.of(dto);
+    public void delete(int id) {
+
+        if (!supplierRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Proveedor no encontrado con ID: " + id);
         }
-        return Optional.empty();
+
+        long productCount = productRepository.countBySupplierId(id);
+
+        if (productCount > 0) {
+            throw new BusinessException(
+                    "No se puede eliminar el proveedor porque tiene " + productCount +
+                            " producto(s) asociado(s). Elimine o reasigne los productos primero."
+            );
+        }
+
+        // 3. Si no tiene productos, eliminar
+        supplierRepository.deleteById(id);
     }
+
 
     @Transactional
     public Optional<SupplierResponseDTO> update(int id,SupplierRequestDTO supplierDto){

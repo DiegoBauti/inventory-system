@@ -26,7 +26,7 @@ public class Product {
     private String description;
     private boolean status=true;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at",insertable = false, updatable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at",insertable = false, updatable = false)
     private LocalDateTime updatedAt;

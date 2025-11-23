@@ -41,13 +41,11 @@ public class CategoryController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id){
-        Optional<CategoryResponseDTO> category=categoryService.delete(id);
-        if (category.isPresent()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        categoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
+
 
     @PatchMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> update(@PathVariable int id,@RequestBody CategoryRequestDTO categoryDto){

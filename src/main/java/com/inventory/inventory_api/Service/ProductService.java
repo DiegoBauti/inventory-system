@@ -1,8 +1,13 @@
 package com.inventory.inventory_api.Service;
 
 import com.inventory.inventory_api.Entity.Product;
+import com.inventory.inventory_api.Entity.Category;
+import com.inventory.inventory_api.Entity.Supplier;
+import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.ProductMapper;
+import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
+import com.inventory.inventory_api.Repository.SupplierRepository;
 import com.inventory.inventory_api.dto.ProductRequestDTO;
 import com.inventory.inventory_api.dto.ProductResponseDTO;
 import org.springframework.stereotype.Service;
@@ -14,20 +19,24 @@ import java.util.Optional;
 @Service
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
+    private final SupplierRepository supplierRepository;
 
-    public ProductService(ProductRepository productRepository){
+    public ProductService(ProductRepository productRepository,CategoryRepository categoryRepository,SupplierRepository supplierRepository){
         this.productRepository=productRepository;
+        this.categoryRepository=categoryRepository;
+        this.supplierRepository=supplierRepository;
     }
 
     @Transactional(readOnly = true)
     public List<ProductResponseDTO> findAll(){
-        List<Product> products=(List<Product>) productRepository.findAll();
+        List<Product> products = productRepository.findByStatusTrue();
         return ProductMapper.toDTOList(products);
     }
 
     @Transactional(readOnly = true)
     public Optional<ProductResponseDTO> findById(int id){
-        Optional<Product> productOpt=productRepository.findById(id);
+        Optional<Product> productOpt=productRepository.findByIdAndStatusTrue(id);
         if (productOpt.isPresent()) {
             Product product = productOpt.get();
             ProductResponseDTO dto = ProductMapper.toDTO(product);
@@ -39,19 +48,34 @@ public class ProductService {
 
     @Transactional
     public ProductResponseDTO save(ProductRequestDTO productDto){
-        Product product=ProductMapper.toEntity(productDto);
+        Category category = categoryRepository.findById(productDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Categoría no encontrada con ID: " + productDto.getCategoryId()
+                ));
+
+        Supplier supplier = supplierRepository.findById(productDto.getSupplierId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Proveedor no encontrado con ID: " + productDto.getSupplierId()
+                ));
+
+        Product product = ProductMapper.toEntity(productDto);
+        product.setCategory(category);
+        product.setSupplier(supplier);
+
         Product saved = productRepository.save(product);
+
         return ProductMapper.toDTO(saved);
     }
 
+
     @Transactional
     public Optional<ProductResponseDTO> delete(int id){
-        Optional<Product> productOptional=productRepository.findById(id);
+        Optional<Product> productOptional=productRepository.findByIdAndStatusTrue(id);
         if (productOptional.isPresent()){
             Product product=productOptional.get();
-            ProductResponseDTO dto=ProductMapper.toDTO(product);
-            productRepository.delete(product);
-            return Optional.of(dto);
+            product.setStatus(false);
+            Product updated = productRepository.save(product);
+            return Optional.of(ProductMapper.toDTO(updated));
         }
         return Optional.empty();
     }

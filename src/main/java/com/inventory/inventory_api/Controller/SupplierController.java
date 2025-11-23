@@ -1,9 +1,6 @@
 package com.inventory.inventory_api.Controller;
 
-import com.inventory.inventory_api.Service.CategoryService;
 import com.inventory.inventory_api.Service.SupplierService;
-import com.inventory.inventory_api.dto.CategoryRequestDTO;
-import com.inventory.inventory_api.dto.CategoryResponseDTO;
 import com.inventory.inventory_api.dto.SupplierRequestDTO;
 import com.inventory.inventory_api.dto.SupplierResponseDTO;
 import org.springframework.http.HttpStatus;
@@ -43,13 +40,11 @@ public class SupplierController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id){
-        Optional<SupplierResponseDTO> supplier=supplierService.delete(id);
-        if (supplier.isPresent()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> delete(@PathVariable int id) {
+        supplierService.delete(id);
+        return ResponseEntity.noContent().build();
     }
+
 
     @PatchMapping("/{id}")
     public ResponseEntity<SupplierResponseDTO> update(@PathVariable int id,@RequestBody SupplierRequestDTO supplierDto){
