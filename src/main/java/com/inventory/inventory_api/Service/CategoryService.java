@@ -6,8 +6,9 @@ import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.CategoryMapper;
 import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
-import com.inventory.inventory_api.dto.CategoryRequestDTO;
+import com.inventory.inventory_api.dto.CategoryCreateDTO;
 import com.inventory.inventory_api.dto.CategoryResponseDTO;
+import com.inventory.inventory_api.dto.CategoryUpdateDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,8 +45,12 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryResponseDTO save(CategoryRequestDTO categoryDto){
-        Category category=CategoryMapper.toEntity(categoryDto);
+    public CategoryResponseDTO save(CategoryCreateDTO categoryDto){
+        if (categoryRepository.existsByName(categoryDto.getName())) {
+            throw new BusinessException("There is already a category with that name");
+        }
+
+        Category category = CategoryMapper.toEntity(categoryDto);
         Category saved = categoryRepository.save(category);
         return CategoryMapper.toDTO(saved);
     }
@@ -53,29 +58,34 @@ public class CategoryService {
     @Transactional
     public void delete(int id){
         if (!categoryRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Categoría no encontrada con ID: " + id);
+            throw new ResourceNotFoundException("Category not found with ID: " + id);
         }
 
         long productsCount = productRepository.countByCategoryId(id);
 
         if (productsCount > 0) {
             throw new BusinessException(
-                    "No se puede eliminar la categoría porque tiene " + productsCount +
-                            " producto(s) asociado(s). Elimine o reasigne los productos primero."
+                    "The category cannot be deleted because it has " + productsCount +
+                    " Associated product. Remove or assign the products first"
             );
         }
         categoryRepository.deleteById(id);
     }
 
     @Transactional
-    public Optional<CategoryResponseDTO> update(int id,CategoryRequestDTO categoryDto){
+    public Optional<CategoryResponseDTO> update(int id, CategoryUpdateDTO categoryDto){
         Optional<Category> categoryOpt = categoryRepository.findById(id);
         if (categoryOpt.isPresent()){
+
             Category category=categoryOpt.get();
 
-            if (categoryDto.getName() != null) {
+            if (categoryDto.getName() != null && !category.getName().equalsIgnoreCase(categoryDto.getName())) {
+                if (categoryRepository.existsByName(categoryDto.getName())) {
+                    throw new BusinessException("There is already a category with that name");
+                }
                 category.setName(categoryDto.getName());
             }
+
             if (categoryDto.getDescription() != null) {
                 category.setDescription(categoryDto.getDescription());
             }

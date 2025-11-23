@@ -1,7 +1,7 @@
 package com.inventory.inventory_api.Mapper;
 
 import com.inventory.inventory_api.Entity.Category;
-import com.inventory.inventory_api.dto.CategoryRequestDTO;
+import com.inventory.inventory_api.dto.CategoryCreateDTO;
 import com.inventory.inventory_api.dto.CategoryResponseDTO;
 
 import java.util.ArrayList;
@@ -25,7 +25,7 @@ public class CategoryMapper {
         return dtos;
     }
 
-    public static Category toEntity(CategoryRequestDTO dto) {
+    public static Category toEntity(CategoryCreateDTO dto) {
         Category category = new Category();
         category.setName(dto.getName());
         category.setDescription(dto.getDescription());
