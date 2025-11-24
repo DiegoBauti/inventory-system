@@ -6,16 +6,18 @@ import com.inventory.inventory_api.Entity.Supplier;
 import com.inventory.inventory_api.Exception.BusinessException;
 import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.ProductMapper;
+import com.inventory.inventory_api.Dto.ProductResponseDTO;
 import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.Repository.SupplierRepository;
 import com.inventory.inventory_api.Dto.ProductCreateDTO;
 import com.inventory.inventory_api.Dto.ProductFilterDTO;
-import com.inventory.inventory_api.Dto.ProductResponseDTO;
 import com.inventory.inventory_api.Dto.ProductUpdateDTO;
 import com.inventory.inventory_api.Specification.ProductSpecification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -35,10 +37,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductResponseDTO> findAll(){
-        List<Product> products = productRepository.findByStatusTrue();
-        return ProductMapper.toDTOList(products);
+    public Page<ProductResponseDTO> findAll(Pageable pageable) {
+        Page<Product> products = productRepository.findByStatusTrue(pageable);
+        return products.map(ProductMapper::toDTO);
     }
+
 
     @Transactional(readOnly = true)
     public Optional<ProductResponseDTO> findById(int id){

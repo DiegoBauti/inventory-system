@@ -7,6 +7,10 @@ import com.inventory.inventory_api.Dto.ProductResponseDTO;
 import com.inventory.inventory_api.Dto.ProductUpdateDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -27,8 +31,11 @@ public class ProductContoller {
     }
 
     @GetMapping
-    public ResponseEntity<List<ProductResponseDTO>> findAll() {
-        List<ProductResponseDTO> products = productService.findAll();
+    public ResponseEntity<Page<ProductResponseDTO>> findAll(
+            @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC)
+            Pageable pageable
+    ) {
+        Page<ProductResponseDTO> products = productService.findAll(pageable);
         return ResponseEntity.ok(products);
     }
 
