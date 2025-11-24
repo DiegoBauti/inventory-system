@@ -1,7 +1,7 @@
 package com.inventory.inventory_api.Mapper;
 
 import com.inventory.inventory_api.Entity.Product;
-import com.inventory.inventory_api.dto.*;
+import com.inventory.inventory_api.Dto.*;
 
 import java.util.ArrayList;
 import java.util.List;

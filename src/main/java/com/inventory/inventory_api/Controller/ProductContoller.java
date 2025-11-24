@@ -1,10 +1,10 @@
 package com.inventory.inventory_api.Controller;
 
 import com.inventory.inventory_api.Service.ProductService;
-import com.inventory.inventory_api.dto.ProductCreateDTO;
-import com.inventory.inventory_api.dto.ProductFilterDTO;
-import com.inventory.inventory_api.dto.ProductResponseDTO;
-import com.inventory.inventory_api.dto.ProductUpdateDTO;
+import com.inventory.inventory_api.Dto.ProductCreateDTO;
+import com.inventory.inventory_api.Dto.ProductFilterDTO;
+import com.inventory.inventory_api.Dto.ProductResponseDTO;
+import com.inventory.inventory_api.Dto.ProductUpdateDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/product")
+@RequestMapping("/api/product")
 @Validated
 public class ProductContoller {
 

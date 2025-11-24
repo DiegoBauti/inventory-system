@@ -1,9 +1,9 @@
 package com.inventory.inventory_api.Controller;
 
 import com.inventory.inventory_api.Service.SupplierService;
-import com.inventory.inventory_api.dto.SupplierCreateDTO;
-import com.inventory.inventory_api.dto.SupplierResponseDTO;
-import com.inventory.inventory_api.dto.SupplierUpdateDTO;
+import com.inventory.inventory_api.Dto.SupplierCreateDTO;
+import com.inventory.inventory_api.Dto.SupplierResponseDTO;
+import com.inventory.inventory_api.Dto.SupplierUpdateDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/supplier")
+@RequestMapping("/api/supplier")
 @Validated
 public class SupplierController {
 

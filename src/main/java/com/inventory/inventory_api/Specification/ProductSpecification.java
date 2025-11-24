@@ -1,4 +1,4 @@
-package com.inventory.inventory_api.specification;
+package com.inventory.inventory_api.Specification;
 
 import com.inventory.inventory_api.Entity.Product;
 import jakarta.persistence.criteria.*;

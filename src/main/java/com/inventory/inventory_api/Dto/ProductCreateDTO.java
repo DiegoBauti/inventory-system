@@ -1,4 +1,4 @@
-package com.inventory.inventory_api.dto;
+package com.inventory.inventory_api.Dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;

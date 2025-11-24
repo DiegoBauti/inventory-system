@@ -6,9 +6,9 @@ import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.CategoryMapper;
 import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
-import com.inventory.inventory_api.dto.CategoryCreateDTO;
-import com.inventory.inventory_api.dto.CategoryResponseDTO;
-import com.inventory.inventory_api.dto.CategoryUpdateDTO;
+import com.inventory.inventory_api.Dto.CategoryCreateDTO;
+import com.inventory.inventory_api.Dto.CategoryResponseDTO;
+import com.inventory.inventory_api.Dto.CategoryUpdateDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,8 +1,8 @@
 package com.inventory.inventory_api.Mapper;
 
 import com.inventory.inventory_api.Entity.Category;
-import com.inventory.inventory_api.dto.CategoryCreateDTO;
-import com.inventory.inventory_api.dto.CategoryResponseDTO;
+import com.inventory.inventory_api.Dto.CategoryCreateDTO;
+import com.inventory.inventory_api.Dto.CategoryResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;

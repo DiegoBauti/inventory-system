@@ -1,9 +1,9 @@
 package com.inventory.inventory_api.Controller;
 
 import com.inventory.inventory_api.Service.CategoryService;
-import com.inventory.inventory_api.dto.CategoryCreateDTO;
-import com.inventory.inventory_api.dto.CategoryResponseDTO;
-import com.inventory.inventory_api.dto.CategoryUpdateDTO;
+import com.inventory.inventory_api.Dto.CategoryCreateDTO;
+import com.inventory.inventory_api.Dto.CategoryResponseDTO;
+import com.inventory.inventory_api.Dto.CategoryUpdateDTO;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/api/category")
 @Validated
 public class CategoryController {
 
