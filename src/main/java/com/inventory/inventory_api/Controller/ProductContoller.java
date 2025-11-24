@@ -2,6 +2,7 @@ package com.inventory.inventory_api.Controller;
 
 import com.inventory.inventory_api.Service.ProductService;
 import com.inventory.inventory_api.dto.ProductCreateDTO;
+import com.inventory.inventory_api.dto.ProductFilterDTO;
 import com.inventory.inventory_api.dto.ProductResponseDTO;
 import com.inventory.inventory_api.dto.ProductUpdateDTO;
 import jakarta.validation.Valid;
@@ -59,5 +60,28 @@ public class ProductContoller {
             return ResponseEntity.ok(updated.get());
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<ProductResponseDTO>> searchProducts(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) String categoryName,
+            @RequestParam(required = false) Integer supplierId,
+            @RequestParam(required = false) String supplierName,
+            @RequestParam(required = false) java.math.BigDecimal minPrice,
+            @RequestParam(required = false) java.math.BigDecimal maxPrice
+    ) {
+        ProductFilterDTO filter = new ProductFilterDTO();
+        filter.setName(name);
+        filter.setCategoryId(categoryId);
+        filter.setCategoryName(categoryName);
+        filter.setSupplierId(supplierId);
+        filter.setSupplierName(supplierName);
+        filter.setMinPrice(minPrice);
+        filter.setMaxPrice(maxPrice);
+
+        List<ProductResponseDTO> results = productService.search(filter);
+        return ResponseEntity.ok(results);
     }
 }

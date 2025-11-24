@@ -6,11 +6,12 @@ import java.util.Optional;
 import com.inventory.inventory_api.Entity.Product;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProductRepository extends CrudRepository<Product,Integer> {
+public interface ProductRepository extends CrudRepository<Product,Integer>, JpaSpecificationExecutor<Product> {
     List<Product> findByStatusTrue();
     Optional<Product> findByIdAndStatusTrue(int id);
     long countByCategoryId(int id);

@@ -10,13 +10,17 @@ import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.Repository.SupplierRepository;
 import com.inventory.inventory_api.dto.ProductCreateDTO;
+import com.inventory.inventory_api.dto.ProductFilterDTO;
 import com.inventory.inventory_api.dto.ProductResponseDTO;
 import com.inventory.inventory_api.dto.ProductUpdateDTO;
+import com.inventory.inventory_api.specification.ProductSpecification;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -113,5 +117,24 @@ public class ProductService {
             return Optional.of(ProductMapper.toDTO(updated));
         }
         return Optional.empty();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ProductResponseDTO> search(ProductFilterDTO filter) {
+        Specification<Product> spec = ProductSpecification.filterBy(
+                filter.getName(),
+                filter.getCategoryId(),
+                filter.getCategoryName(),
+                filter.getSupplierId(),
+                filter.getSupplierName(),
+                filter.getMinPrice(),
+                filter.getMaxPrice()
+        );
+
+        List<Product> products = productRepository.findAll(spec);
+
+        return products.stream()
+                .map(ProductMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }
