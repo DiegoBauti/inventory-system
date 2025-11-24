@@ -1,10 +1,14 @@
 package com.inventory.inventory_api.Controller;
 
 import com.inventory.inventory_api.Service.ProductService;
-import com.inventory.inventory_api.dto.ProductRequestDTO;
+import com.inventory.inventory_api.dto.ProductCreateDTO;
 import com.inventory.inventory_api.dto.ProductResponseDTO;
+import com.inventory.inventory_api.dto.ProductUpdateDTO;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +16,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/product")
+@Validated
 public class ProductContoller {
 
     private final ProductService productService;
@@ -27,7 +32,7 @@ public class ProductContoller {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> findById(@PathVariable int id){
+    public ResponseEntity<ProductResponseDTO> findById(@PathVariable @Min(1) int id){
         Optional<ProductResponseDTO> productOpt=productService.findById(id);
         if (productOpt.isPresent()){
             return ResponseEntity.ok(productOpt.get());
@@ -36,21 +41,18 @@ public class ProductContoller {
     }
 
     @PostMapping
-    public ResponseEntity<ProductResponseDTO> save(@RequestBody ProductRequestDTO product){
+    public ResponseEntity<ProductResponseDTO> save(@Valid @RequestBody ProductCreateDTO product){
         return ResponseEntity.status(HttpStatus.CREATED).body(productService.save(product));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable int id){
-        Optional<ProductResponseDTO> product=productService.delete(id);
-        if (product.isPresent()){
-            return ResponseEntity.noContent().build();
-        }
-        return ResponseEntity.notFound().build();
+    public ResponseEntity<Void> delete(@PathVariable @Min(1)  int id){
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ProductResponseDTO> update(@PathVariable int id,@RequestBody ProductRequestDTO productDto){
+    public ResponseEntity<ProductResponseDTO> update(@PathVariable @Min(1) int id,@Valid @RequestBody ProductUpdateDTO productDto){
         Optional<ProductResponseDTO> updated = productService.update(id, productDto);
 
         if (updated.isPresent()) {

@@ -1,6 +1,5 @@
 package com.inventory.inventory_api.dto;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.math.BigDecimal;

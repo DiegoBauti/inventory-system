@@ -25,7 +25,7 @@ public class ProductMapper {
         return dtos;
     }
 
-    public static Product toEntity(ProductRequestDTO dto) {
+    public static Product toEntity(ProductCreateDTO dto) {
         Product product = new Product();
         product.setName(dto.getName());
         product.setPrice(dto.getPrice());

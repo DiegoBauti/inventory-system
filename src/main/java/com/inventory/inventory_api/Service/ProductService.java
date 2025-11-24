@@ -3,13 +3,15 @@ package com.inventory.inventory_api.Service;
 import com.inventory.inventory_api.Entity.Product;
 import com.inventory.inventory_api.Entity.Category;
 import com.inventory.inventory_api.Entity.Supplier;
+import com.inventory.inventory_api.Exception.BusinessException;
 import com.inventory.inventory_api.Exception.ResourceNotFoundException;
 import com.inventory.inventory_api.Mapper.ProductMapper;
 import com.inventory.inventory_api.Repository.CategoryRepository;
 import com.inventory.inventory_api.Repository.ProductRepository;
 import com.inventory.inventory_api.Repository.SupplierRepository;
-import com.inventory.inventory_api.dto.ProductRequestDTO;
+import com.inventory.inventory_api.dto.ProductCreateDTO;
 import com.inventory.inventory_api.dto.ProductResponseDTO;
+import com.inventory.inventory_api.dto.ProductUpdateDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,7 +49,12 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponseDTO save(ProductRequestDTO productDto){
+    public ProductResponseDTO save(ProductCreateDTO productDto){
+
+        if (productRepository.existsByName(productDto.getName())) {
+            throw new BusinessException("There is already a product with that name");
+        }
+
         Category category = categoryRepository.findById(productDto.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Categoría no encontrada con ID: " + productDto.getCategoryId()
@@ -69,26 +76,29 @@ public class ProductService {
 
 
     @Transactional
-    public Optional<ProductResponseDTO> delete(int id){
-        Optional<Product> productOptional=productRepository.findByIdAndStatusTrue(id);
-        if (productOptional.isPresent()){
-            Product product=productOptional.get();
-            product.setStatus(false);
-            Product updated = productRepository.save(product);
-            return Optional.of(ProductMapper.toDTO(updated));
-        }
-        return Optional.empty();
+    public void delete(int id){
+        Product product = productRepository.findByIdAndStatusTrue(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found with ID: " + id)
+                );
+
+        product.setStatus(false);
+        productRepository.save(product);
     }
 
     @Transactional
-    public Optional<ProductResponseDTO> update(int id,ProductRequestDTO productDto){
+    public Optional<ProductResponseDTO> update(int id, ProductUpdateDTO productDto){
         Optional<Product> productOpt = productRepository.findById(id);
         if (productOpt.isPresent()){
             Product product=productOpt.get();
 
-            if (productDto.getName() != null) {
+            if (productDto.getName() != null && !product.getName().equalsIgnoreCase(productDto.getName())) {
+                if (categoryRepository.existsByName(productDto.getName())) {
+                    throw new BusinessException("There is already a category with that name");
+                }
                 product.setName(productDto.getName());
             }
+
             if (productDto.getDescription() != null) {
                 product.setDescription(productDto.getDescription());
             }
