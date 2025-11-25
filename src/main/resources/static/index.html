@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema de Productos</title>
+    <style>
+        body {
+            font-family: Arial;
+            margin: 50px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            max-width: 800px;
+        }
+        input {
+            padding: 5px;
+            margin: 5px 0;
+            width: 200px;
+        }
+        button {
+            padding: 8px 15px;
+            margin: 5px;
+            cursor: pointer;
+            background: #4CAF50;
+            color: white;
+            border: none;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .error {
+            color: red;
+            margin: 10px 0;
+        }
+        .success {
+            color: green;
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            background: #f9f9f9;
+        }
+        th {
+            background: #ddd;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Sistema de Productos</h1>
+
+    <div id="loginSection">
+        <h2>Login</h2>
+        <div>
+            <input type="text" id="username" placeholder="Usuario">
+        </div>
+        <div>
+            <input type="password" id="password" placeholder="Contraseña">
+        </div>
+        <button onclick="login()">Iniciar Sesión</button>
+        <div id="loginError" class="error"></div>
+    </div>
+
+    <div id="productosSection" class="hidden">
+        <h2>Gestión de Productos</h2>
+        <div id="userInfo" class="success"></div>
+        <button onclick="listarProductos()">Listar Productos</button>
+        <button onclick="logout()">Cerrar Sesión</button>
+        <div id="productosError" class="error"></div>
+
+        <table id="productosTable" class="hidden">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Precio</th>
+                <th>Stock</th>
+            </tr>
+            </thead>
+            <tbody id="productosBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:8080';
+
+    window.onload = function() {
+        const token = localStorage.getItem('token');
+        if (token) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('productosSection').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = 'Sesión activa';
+        }
+    };
+
+    async function login() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const errorDiv = document.getElementById('loginError');
+
+        errorDiv.textContent = '';
+
+        if (!username || !password) {
+            errorDiv.textContent = 'Complete todos los campos';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/api/auth/signin`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Credenciales incorrectas');
+            }
+
+            const data = await response.json();
+
+            localStorage.setItem('token', data.token);
+
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('productosSection').classList.remove('hidden');
+            document.getElementById('userInfo').textContent = `Bienvenido ${username}`;
+
+        } catch (error) {
+            errorDiv.textContent = 'Error: ' + error.message;
+        }
+    }
+
+    async function listarProductos() {
+        const token = localStorage.getItem('token');
+        const errorDiv = document.getElementById('productosError');
+        const table = document.getElementById('productosTable');
+        const tbody = document.getElementById('productosBody');
+
+        errorDiv.textContent = '';
+        tbody.innerHTML = '';
+
+        if (!token) {
+            errorDiv.textContent = 'No hay token. Inicie sesión';
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_URL}/api/product`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al obtener productos');
+            }
+
+            const data = await response.json();
+
+            let productos;
+            if (data.content && Array.isArray(data.content)) {
+                productos = data.content;
+            } else {
+                console.log('Respuesta completa:', data);
+                throw new Error('Formato de respuesta no reconocido. Ver consola.');
+            }
+
+            if (productos.length === 0) {
+                errorDiv.textContent = 'No hay productos disponibles';
+                return;
+            }
+
+            productos.forEach(producto => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = producto.id || '';
+                row.insertCell(1).textContent = producto.name || '';
+                row.insertCell(2).textContent = producto.description || '';
+                row.insertCell(3).textContent = producto.price ? '$' + producto.price : '';
+                row.insertCell(4).textContent = producto.stock || 0;
+            });
+
+            table.classList.remove('hidden');
+
+        } catch (error) {
+            errorDiv.textContent = 'Error: ' + error.message;
+        }
+    }
+
+    function logout() {
+        localStorage.removeItem('token');
+        document.getElementById('loginSection').classList.remove('hidden');
+        document.getElementById('productosSection').classList.add('hidden');
+        document.getElementById('productosTable').classList.add('hidden');
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('userInfo').textContent = '';
+    }
+</script>
+</body>
+</html>
